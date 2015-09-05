@@ -52,13 +52,17 @@
 			text-decoration: none;
 			vertical-align: middle;
    		}
-		.button:hover {
-			border-top-color: #28597a;
+		.button:hover:enabled {
 			background: #28597a;
 			color: #ccc;
+			cursor: pointer;
 		}
+		
 		.button:active {
-			border-top-color: #1b435e;
+			background: #1b435e;
+		}
+		
+		.button:disabled {
 			background: #1b435e;
 		}
    
@@ -84,12 +88,97 @@
 			padding: 5px 10px;
 			box-shadow: 0 0 15px 5px #1b4b6d;
 		}
+		
 		.error {
 			background-color: #E01563;
 		}
 		
 		.success {
 			background-color: #49B658
+		}
+		
+		.spinner {
+			box-shadow: 0 0 15px 5px #1b4b6d;
+			/* Size and position */
+			font-size: 100px; /* 1em */
+			width: 1em;
+			height: 1em;
+			margin: 100px auto;
+			position: relative;
+		
+			/* Styles */
+			list-style: none;
+			border-radius: 50%;
+			border: .01em solid rgba(150,150,150,0.1); /* Subtle white line circling the dots */
+		}
+		
+		.spinner li {
+			width: .2em;
+			height: .2em;
+			position: absolute;
+			border-radius: 50%;
+		}
+		
+		.spinner li:nth-child(1) {
+			background: #00C176; /* Blue */
+			top: 0;
+			left: 50%;
+			margin-left: -.1em; /* Width/2 */
+			transform-origin: 50% 250%;
+			animation: 
+				rota 1.13s linear infinite,
+				opa 3.67s ease-in-out infinite alternate;
+		}
+		
+		.spinner li:nth-child(2) {
+			background: #FF003C; /* Red */
+			top: 50%; 
+			right: 0;
+			margin-top: -.1em; /* Height/2 */
+			transform-origin: -150% 50%;
+			animation: 
+				rota 1.86s linear infinite,
+				opa 4.29s ease-in-out infinite alternate;
+		}
+		
+		.spinner li:nth-child(3) {
+			background: #FABE28; /* Yellow */
+			bottom: 0;
+			left: 50%; 
+			margin-left: -.1em; /* Width/2 */
+			transform-origin: 50% -150%;
+			animation: 
+				rota 1.45s linear infinite,
+				opa 5.12s ease-in-out infinite alternate;
+		}
+		
+		.spinner li:nth-child(4) {
+			background: #88C100; /* Green */
+			top: 50%; 
+			left: 0;
+			margin-top: -.1em; /* Height/2 */
+			transform-origin: 250% 50%;
+			animation: 
+				rota 1.72s linear infinite,
+				opa 5.25s ease-in-out infinite alternate;
+		}
+		
+		@keyframes rota {
+			to { transform: rotate(360deg); }
+		}
+		
+		@keyframes opa {
+			12.0% { opacity: 0.80; }
+			19.5% { opacity: 0.88; }
+			37.2% { opacity: 0.64; }
+			40.5% { opacity: 0.52; }
+			52.7% { opacity: 0.69; }
+			60.2% { opacity: 0.60; }
+			66.6% { opacity: 0.52; }
+			70.0% { opacity: 0.63; }
+			79.9% { opacity: 0.60; }
+			84.2% { opacity: 0.75; }
+			91.0% { opacity: 0.87; }
 		}
 	</style>
 </head>
@@ -104,8 +193,17 @@
 		<div class="search-wrapper">
 			<form id="slackForm">
 				<input type="email" name="email" name="focus" required class="search-box" placeholder="Email Address" />
-				<button class="button" type="submit">Join</button>
+				<button id="invite-button" class="button" type="submit">Join</button>
 			</form>
+			<div id="spinner-box" class="spinner-box" style="display: none;">
+				<p>Preparing invitation...</p>
+				<ul class="spinner" style="margin-top: 5px">
+					<li></li>
+					<li></li>
+					<li></li>
+					<li></li>
+				</ul>
+			</div>
 			<div id="resultDiv" style="margin-top: 15px;">
 				<p id="result" class="" />
 			</div>
@@ -119,15 +217,33 @@
 		var error = "An error occurred.  Please contact ask@techreformation.com, and we will give you an invite as soon as possible";
 		var invalidEmail = "The email you have given is not valid.";
 		
-		var changeResult = function(text, className) {
+		var showResult = function(text, className) {
 			var el = document.getElementById("result");
 			var div = document.getElementById("resultDiv");
 			el.innerHTML = text;
 			div.className = "alert " + className;
+			div.style.display = "block";
 		} 
 		
+		var hideResult = function()
+		{
+			var div = document.getElementById("resultDiv");
+			div.style.display = "none";
+		}
+		
+		var toggleSubmit = function()
+		{
+			var btn = document.getElementById("invite-button");
+			btn.disabled = !btn.disabled;
+		}
+		
 		$("#slackForm").submit(function(event) {
-			$.post('http://slackintegrations.herokuapp.com/techrefinvite', $("#slackForm").serialize(), function(data) {
+			toggleSubmit();
+			hideResult();
+			var spinner = document.getElementById("spinner-box");
+			spinner.style.display = "block";
+			console.log("Maaa");
+			$.post('http://localhost:5000/techrefinvite', $("#slackForm").serialize(), function(data) {
 				var json = JSON.parse(data);
 				var text = '';
 				var className = '';
@@ -152,10 +268,14 @@
 					className = "error";
 				}
 			
-				changeResult(text, className);	
+				showResult(text, className);
+			    spinner.style.display = "none";	
+				toggleSubmit();
     		})
 			.error(function() {
-				changeResult(error, "error");
+				showResult(error, "error");
+			    spinner.style.display = "none";
+				toggleSubmit();
 			});
 			event.preventDefault();
 		});
