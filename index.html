@@ -242,7 +242,6 @@
 			hideResult();
 			var spinner = document.getElementById("spinner-box");
 			spinner.style.display = "block";
-			console.log("Maaa");
 			$.post('http://localhost:5000/techrefinvite', $("#slackForm").serialize(), function(data) {
 				var json = JSON.parse(data);
 				var text = '';
