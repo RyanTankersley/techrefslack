@@ -242,7 +242,7 @@
 			hideResult();
 			var spinner = document.getElementById("spinner-box");
 			spinner.style.display = "block";
-			$.post('http://localhost:5000/techrefinvite', $("#slackForm").serialize(), function(data) {
+			$.post('http://slackintegrations.herokuapp.com/techrefinvite', $("#slackForm").serialize(), function(data) {
 				var json = JSON.parse(data);
 				var text = '';
 				var className = '';
