@@ -212,8 +212,8 @@
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script>
-		var success = "We've sent you an invite! Follow the instructions in the email, and we will see you soon.";
-		var alreadyInvited = "You have already been invited.  If the email never arrives, contact ask@techreformation.com, and we will give you an invite as soon as possible!";
+		var success = "We sent you an invite! Follow the instructions in the email, and we will see you soon.";
+		var alreadyInvited = "You have already been invited.  Head over to slack.techreformation.com to get started! If you have any trouble, contact ask@techreformation.com, and we will help as soon as possible!";
 		var error = "An error occurred.  Please contact ask@techreformation.com, and we will give you an invite as soon as possible";
 		var invalidEmail = "The email you have given is not valid.";
 		
@@ -242,34 +242,43 @@
 			hideResult();
 			var spinner = document.getElementById("spinner-box");
 			spinner.style.display = "block";
-			$.post('http://slackintegrations.herokuapp.com/techrefinvite', $("#slackForm").serialize(), function(data) {
-				var json = JSON.parse(data);
-				var text = '';
-				var className = '';
-				if(json.ok)
-				{
-					text = success;
-					className = "success";
+			var url = 'https://slackintegrations.herokuapp.com/techrefinvite';
+			//var url = 'http://localhost:5000/techrefinvite';
+			$.post(url , $("#slackForm").serialize(), function(data) {
+				try {
+					var json = JSON.parse(data);
+					var text = '';
+					var className = '';
+					if(json.ok)
+					{
+						text = success;
+						className = "success";
+					}
+					else if(json.error === "already_invited")
+					{
+						text = alreadyInvited;
+						className = "error";
+					}
+					else if(json.error === "invalid_email")
+					{
+						text = invalidEmail;
+						className = "error";
+					}
+					else
+					{
+						text = error;
+						className = "error";
+					}
 				}
-				else if(json.error === "already_invited")
-				{
-					text = alreadyInvited;
-					className = "error";
-				}
-				else if(json.error === "invalid_email")
-				{
-					text = invalidEmail;
-					className = "error";
-				}
-				else
-				{
+				catch(err) {
 					text = error;
 					className = "error";
 				}
-			
-				showResult(text, className);
-			    spinner.style.display = "none";	
-				toggleSubmit();
+				finally {
+			    	spinner.style.display = "none";	
+					showResult(text, className);
+					toggleSubmit();
+				}
     		})
 			.error(function() {
 				showResult(error, "error");
