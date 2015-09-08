@@ -20,20 +20,12 @@
 			border: 1px solid #ccc;
   			outline: 0;
   			border-radius: 15px;
+			margin-bottom: 10px;
 		}
 		
 		.search-box,.close-icon,.search-wrapper {
 			position: relative;
 			padding: 10px;
-		}
-		
-		.enter-button {
-			display: inline-block;
-			vertical-align: middle;
-  			cursor: pointer;
-			width: 50px;
-			height: 35px;
-  			border-radius: 15px;
 		}
 		
 		.button {
@@ -50,8 +42,10 @@
 			font-size: 14px;
 			height: 35px;
 			text-decoration: none;
-			vertical-align: middle;
+			display: block;
+			margin: auto;
    		}
+		   
 		.button:hover:enabled {
 			background: #28597a;
 			color: #ccc;
@@ -193,6 +187,8 @@
 		<div class="search-wrapper">
 			<form id="slackForm">
 				<input type="email" name="email" name="focus" required class="search-box" placeholder="Email Address" />
+				<input type="text" name="fname" name="focus" required class="search-box" placeholder="First Name" />
+				<input type="text" name="lname" name="focus" required class="search-box" placeholder="Last Name" />
 				<button id="invite-button" class="button" type="submit">Join</button>
 			</form>
 			<div id="spinner-box" class="spinner-box" style="display: none;">
