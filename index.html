@@ -212,7 +212,7 @@
 		var alreadyInvited = "You have already been invited.  Head over to slack.techreformation.com to get started! If you have any trouble, contact ask@techreformation.com, and we will help as soon as possible!";
 		var error = "An error occurred.  Please contact ask@techreformation.com, and we will give you an invite as soon as possible";
 		var invalidEmail = "The email you have given is not valid.";
-		
+		var inTeam = "You are already in the group!  Head over to slack.techreformation.com to join in the conversation! If you have any trouble, contact ask@techreformation.com, and we will help as soon as possible."
 		var showResult = function(text, className) {
 			var el = document.getElementById("result");
 			var div = document.getElementById("resultDiv");
@@ -258,6 +258,10 @@
 					else if(json.error === "invalid_email")
 					{
 						text = invalidEmail;
+						className = "error";
+					}
+					else if(json.error === "already_in_team") {
+						text = inTeam;
 						className = "error";
 					}
 					else
