@@ -243,8 +243,8 @@
 			hideResult();
 			var spinner = document.getElementById("spinner-box");
 			spinner.style.display = "block";
-			//var url = 'https://lutherbot.herokuapp.com/techrefinvite';
-			var url = 'http://localhost:5000/techrefinvite';
+			var url = 'https://lutherbot.herokuapp.com/techrefinvite';
+			//var url = 'http://localhost:5000/techrefinvite';
 			$.post(url, $("#slackForm").serialize(), function(data) {
 				try {
 					var json = JSON.parse(data);
