@@ -205,6 +205,10 @@
 				<p id="result" class="" />
 			</div>
 		</div>
+        <div>
+            <p style='font-size: 20px; margin-top: -10px; margin-bottom: 10px;'>After joining, enter our Slack here:</p>
+           <a href='https://techreformation.slack.com/messages' style='text-decoration: none;'><button class='button'>Enter Our Slack</button>
+        </div>
 	</div>
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -239,8 +243,8 @@
 			hideResult();
 			var spinner = document.getElementById("spinner-box");
 			spinner.style.display = "block";
-			var url = 'https://lutherbot.herokuapp.com/techrefinvite';
-			//var url = 'http://localhost:5000/techrefinvite';
+			//var url = 'https://lutherbot.herokuapp.com/techrefinvite';
+			var url = 'http://localhost:5000/techrefinvite';
 			$.post(url, $("#slackForm").serialize(), function(data) {
 				try {
 					var json = JSON.parse(data);
