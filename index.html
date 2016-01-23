@@ -6,7 +6,7 @@
 
 	<title>Tech Reformation</title>
   
-  	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+  	<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 	<style>
 		body {
 			font-family: 'Open Sans';
@@ -90,6 +90,10 @@
 		
 		.success {
 			background-color: #49B658
+		}
+		
+		.success-fore {
+			color: #49B658
 		}
 		
 		.spinner {
@@ -183,6 +187,7 @@
 		<img class="img-scaleable" src="logo.png" />
 		<div>
 			<h1>Join us on Slack!</h1>
+            <h3 id="status" style="display: none;"><span id="online" class="success-fore">21</span> of <span id="total" class="success-fore">21</span> members chatting are currently active</h3>
 			<img src="slack_icon.png" height="100px" width="100px" />
 		</div>
 		<div class="search-wrapper">
@@ -213,6 +218,20 @@
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script>
+        var getCurrentMemberCount = function() {
+			var url = 'https://lutherbot.herokuapp.com/techrefmembercount';
+            $.get(url, function(data) {
+                var status = document.getElementById('status');
+                status.style.display = "block";
+                var online = document.getElementById('online');
+                online.innerHTML = data.online;
+                var total = document.getElementById('total');
+                total.innerHTML = data.total;
+            });
+        };
+        
+        getCurrentMemberCount();
+        
 		var success = "We sent you an invite! Follow the instructions in the email, and we will see you soon.";
 		var alreadyInvited = "You have already been invited.  Head over to slack.techreformation.com to get started! If you have any trouble, contact ask@techreformation.com, and we will help as soon as possible!";
 		var error = "An error occurred.  Please contact ask@techreformation.com, and we will give you an invite as soon as possible";
@@ -238,6 +257,48 @@
 			btn.disabled = !btn.disabled;
 		}
 		
+        var inviteFinished = function(data) {
+			try {
+				var json = JSON.parse(data);
+				var text = '';
+				var className = '';
+				if(json.ok)
+				{
+					text = success;
+					className = "success";
+				}
+				else if(json.error === "already_invited")
+				{
+					text = alreadyInvited;
+					className = "error";
+				}
+				else if(json.error === "invalid_email")
+				{
+					text = invalidEmail;
+					className = "error";
+				}
+				else if(json.error === "already_in_team") {
+					text = inTeam;
+					className = "error";
+				}
+				else
+				{
+					text = error;
+					className = "error";
+				}
+			}
+			catch(err) {
+				text = error;
+				className = "error";
+			}
+			finally {
+			    var spinner = document.getElementById("spinner-box");
+		    	spinner.style.display = "none";	
+				showResult(text, className);
+				toggleSubmit();
+			}
+    	};
+        
 		$("#slackForm").submit(function(event) {
 			toggleSubmit();
 			hideResult();
@@ -245,46 +306,7 @@
 			spinner.style.display = "block";
 			var url = 'https://lutherbot.herokuapp.com/techrefinvite';
 			//var url = 'http://localhost:5000/techrefinvite';
-			$.post(url, $("#slackForm").serialize(), function(data) {
-				try {
-					var json = JSON.parse(data);
-					var text = '';
-					var className = '';
-					if(json.ok)
-					{
-						text = success;
-						className = "success";
-					}
-					else if(json.error === "already_invited")
-					{
-						text = alreadyInvited;
-						className = "error";
-					}
-					else if(json.error === "invalid_email")
-					{
-						text = invalidEmail;
-						className = "error";
-					}
-					else if(json.error === "already_in_team") {
-						text = inTeam;
-						className = "error";
-					}
-					else
-					{
-						text = error;
-						className = "error";
-					}
-				}
-				catch(err) {
-					text = error;
-					className = "error";
-				}
-				finally {
-			    	spinner.style.display = "none";	
-					showResult(text, className);
-					toggleSubmit();
-				}
-    		})
+			$.post(url, $("#slackForm").serialize(), inviteFinished)
 			.error(function() {
 				showResult(error, "error");
 			    spinner.style.display = "none";
